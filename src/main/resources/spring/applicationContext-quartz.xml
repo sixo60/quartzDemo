@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans    
+    http://www.springframework.org/schema/beans/spring-beans-4.3.xsd    
+    http://www.springframework.org/schema/tx    
+    http://www.springframework.org/schema/tx/spring-tx-4.3.xsd   
+    http://www.springframework.org/schema/context   
+    http://www.springframework.org/schema/context/spring-context-4.3.xsd   
+    http://www.springframework.org/schema/mvc   
+    http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+
+	<!-- 第一种方式 -->
+	<bean id="testQuartz1" class="com.sixo.quartz.QuartzTest">
+	</bean>
+	<bean id="testJob1"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="testQuartz1" />
+		<property name="targetMethod" value="testMethod" />
+		<property name="concurrent" value="false"></property>
+	</bean>
+	<bean id="testTrigger1"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="testJob1" />
+		<!-- 每10秒执行一次 -->
+		<property name="cronExpression" value="0/10 * * * * ?"></property>
+	</bean>
+
+	<!-- 第二种方式 -->
+	<bean id="testJob2" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="name" value="testJob2" />
+		<property name="jobClass" value="com.sixo.quartz.QuartzTest2" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="service">
+					<value>simple is the beat</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	<bean id="testTrigger2"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="testJob2" />
+		<!-- 每10秒执行一次 -->
+		<property name="cronExpression" value="0/5 * * * * ?"></property>
+	</bean>
+
+	<bean id="schedulerFactory"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="testTrigger1" />
+				<ref bean="testTrigger2" />
+			</list>
+		</property>
+	</bean>
+</beans>
